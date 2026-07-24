@@ -15,6 +15,11 @@ readonly CACHE_HEADER_NAME="Cache-Control"
 readonly STATIC_CACHE_VALUE="public, max-age=31536000, immutable"
 readonly MUTABLE_CACHE_VALUE="no-store"
 readonly READY_PATH="/themes/classic/assets/theme.css"
+readonly PRODUCT_IMAGE_RESPONSE="product image"
+readonly CATEGORY_IMAGE_RESPONSE="category image"
+readonly ALPHA_CATEGORY_IMAGE_RESPONSE="alpha category image"
+readonly LEGACY_FANCYBOX_RESPONSE="legacy fancybox image"
+readonly API_DISPATCHER_RESPONSE="api:"
 
 TEMP_DIR="$(mktemp -d)"
 readonly TEMP_DIR
@@ -31,17 +36,26 @@ trap cleanup EXIT INT TERM
 write_fixture() {
 	mkdir -p \
 		"${APP_DIR}/config" \
+		"${APP_DIR}/img/c" \
+		"${APP_DIR}/img/p/1/2/3" \
+		"${APP_DIR}/js/jquery/plugins/fancybox/images" \
 		"${APP_DIR}/var/logs" \
 		"${APP_DIR}/vendor" \
+		"${APP_DIR}/webservice" \
 		"${APP_DIR}/themes/classic/assets"
 
 	printf '%s\n' '<?php header("Content-Type: text/plain"); echo "fallback:" . $_SERVER["REQUEST_URI"];' > "${APP_DIR}/index.php"
+	printf '%s\n' "<?php header('Content-Type: text/plain'); echo '${API_DISPATCHER_RESPONSE}' . \$_GET['url'];" > "${APP_DIR}/webservice/dispatcher.php"
 	printf '%s\n' 'APP_SECRET=must-not-leak' > "${APP_DIR}/.env"
 	printf '%s\n' '{"autoload":{}}' > "${APP_DIR}/composer.json"
 	printf '%s\n' '<?php echo "config leak";' > "${APP_DIR}/config/settings.inc.php"
 	printf '%s\n' '<?php echo "vendor leak";' > "${APP_DIR}/vendor/autoload.php"
 	printf '%s\n' 'sensitive log' > "${APP_DIR}/var/logs/prod.log"
 	printf '%s\n' 'body{color:#111}' > "${APP_DIR}/themes/classic/assets/theme.css"
+	printf '%s\n' "$PRODUCT_IMAGE_RESPONSE" > "${APP_DIR}/img/p/1/2/3/123-demo.jpg"
+	printf '%s\n' "$CATEGORY_IMAGE_RESPONSE" > "${APP_DIR}/img/c/12-category.jpg"
+	printf '%s\n' "$ALPHA_CATEGORY_IMAGE_RESPONSE" > "${APP_DIR}/img/c/fr-12.jpg"
+	printf '%s\n' "$LEGACY_FANCYBOX_RESPONSE" > "${APP_DIR}/js/jquery/plugins/fancybox/images/loading.gif"
 	printf '%s\n' 'id,name' > "${APP_DIR}/export.csv"
 }
 
@@ -140,5 +154,17 @@ assert_status "$BASE_URL" "/" "$EXPECTED_OK"
 assert_body_contains "$BASE_URL" "/" "fallback:/"
 assert_status "$BASE_URL" "/fr/robes/1-demo-product.html?token=ok" "$EXPECTED_OK"
 assert_body_contains "$BASE_URL" "/fr/robes/1-demo-product.html?token=ok" "fallback:/fr/robes/1-demo-product.html?token=ok"
+assert_status "$BASE_URL" "/123-demo/product-image.jpg" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/123-demo/product-image.jpg" "$PRODUCT_IMAGE_RESPONSE"
+assert_status "$BASE_URL" "/c/12-category/category-image.jpg" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/c/12-category/category-image.jpg" "$CATEGORY_IMAGE_RESPONSE"
+assert_status "$BASE_URL" "/c/fr-12/category-image.jpg" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/c/fr-12/category-image.jpg" "$ALPHA_CATEGORY_IMAGE_RESPONSE"
+assert_status "$BASE_URL" "/images_ie/loading.gif" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/images_ie/loading.gif" "$LEGACY_FANCYBOX_RESPONSE"
+assert_status "$BASE_URL" "/api/products" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/api/products" "${API_DISPATCHER_RESPONSE}products"
+assert_status "$BASE_URL" "/upload/module-file.txt" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/upload/module-file.txt" "fallback:/upload/module-file.txt"
 
 printf 'PrestaShop FrankenPHP Caddy routing test passed.\n'

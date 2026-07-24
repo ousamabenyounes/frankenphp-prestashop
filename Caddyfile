@@ -35,6 +35,42 @@
 	}
 	header @mutableAssets Cache-Control "no-store"
 
+	@webserviceApi path_regexp webserviceApi ^/api/?(.*)$
+	rewrite @webserviceApi /webservice/dispatcher.php?url={http.regexp.webserviceApi.1}
+
+	@uploadFallback path_regexp uploadFallback ^/upload/.+$
+	rewrite @uploadFallback /index.php
+
+	@productImage1 path_regexp productImage1 ^/(([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage1 /img/p/{http.regexp.productImage1.2}/{http.regexp.productImage1.1}{http.regexp.productImage1.3}
+
+	@productImage2 path_regexp productImage2 ^/(([\d])([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage2 /img/p/{http.regexp.productImage2.2}/{http.regexp.productImage2.3}/{http.regexp.productImage2.1}{http.regexp.productImage2.4}
+
+	@productImage3 path_regexp productImage3 ^/(([\d])([\d])([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage3 /img/p/{http.regexp.productImage3.2}/{http.regexp.productImage3.3}/{http.regexp.productImage3.4}/{http.regexp.productImage3.1}{http.regexp.productImage3.5}
+
+	@productImage4 path_regexp productImage4 ^/(([\d])([\d])([\d])([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage4 /img/p/{http.regexp.productImage4.2}/{http.regexp.productImage4.3}/{http.regexp.productImage4.4}/{http.regexp.productImage4.5}/{http.regexp.productImage4.1}{http.regexp.productImage4.6}
+
+	@productImage5 path_regexp productImage5 ^/(([\d])([\d])([\d])([\d])([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage5 /img/p/{http.regexp.productImage5.2}/{http.regexp.productImage5.3}/{http.regexp.productImage5.4}/{http.regexp.productImage5.5}/{http.regexp.productImage5.6}/{http.regexp.productImage5.1}{http.regexp.productImage5.7}
+
+	@productImage6 path_regexp productImage6 ^/(([\d])([\d])([\d])([\d])([\d])([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage6 /img/p/{http.regexp.productImage6.2}/{http.regexp.productImage6.3}/{http.regexp.productImage6.4}/{http.regexp.productImage6.5}/{http.regexp.productImage6.6}/{http.regexp.productImage6.7}/{http.regexp.productImage6.1}{http.regexp.productImage6.8}
+
+	@productImage7 path_regexp productImage7 ^/(([\d])([\d])([\d])([\d])([\d])([\d])([\d])(?:-[\w-]*)?)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @productImage7 /img/p/{http.regexp.productImage7.2}/{http.regexp.productImage7.3}/{http.regexp.productImage7.4}/{http.regexp.productImage7.5}/{http.regexp.productImage7.6}/{http.regexp.productImage7.7}/{http.regexp.productImage7.8}/{http.regexp.productImage7.1}{http.regexp.productImage7.9}
+
+	@numericCategoryImage path_regexp numericCategoryImage ^/c/([\d]+)(_thumb)?(-[.*\w-]*)/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @numericCategoryImage /img/c/{http.regexp.numericCategoryImage.1}{http.regexp.numericCategoryImage.2}{http.regexp.numericCategoryImage.3}{http.regexp.numericCategoryImage.4}
+
+	@alphaCategoryImage path_regexp alphaCategoryImage ^/c/([a-zA-Z_-]+)(_thumb)?(-[\d]+)?/.+(\.(?:jpe?g|webp|png|avif))$
+	rewrite @alphaCategoryImage /img/c/{http.regexp.alphaCategoryImage.1}{http.regexp.alphaCategoryImage.2}{http.regexp.alphaCategoryImage.3}{http.regexp.alphaCategoryImage.4}
+
+	@legacyFancyboxImages path_regexp legacyFancyboxImages ^/images_ie/?([^/]+)\.(jpe?g|png|gif)$
+	rewrite @legacyFancyboxImages /js/jquery/plugins/fancybox/images/{http.regexp.legacyFancyboxImages.1}.{http.regexp.legacyFancyboxImages.2}
+
 	php_server {
 		try_files {path} /index.php
 	}

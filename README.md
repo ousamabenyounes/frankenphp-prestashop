@@ -1,5 +1,8 @@
 # PrestaShop on FrankenPHP
 
+[![CI](https://github.com/ousamabenyounes/frankenphp-prestashop/actions/workflows/ci.yaml/badge.svg)](https://github.com/ousamabenyounes/frankenphp-prestashop/actions/workflows/ci.yaml)
+[![E2E](https://github.com/ousamabenyounes/frankenphp-prestashop/actions/workflows/e2e.yaml/badge.svg)](https://github.com/ousamabenyounes/frankenphp-prestashop/actions/workflows/e2e.yaml)
+
 Run PrestaShop 9.1.4 on top of FrankenPHP using the official FrankenPHP Docker image, Caddy, MariaDB, Redis, and OPCache.
 
 This repository is intentionally a skeleton, not a fork of PrestaShop. Put a PrestaShop source tree in `prestashop/`, copy `.env.example` to `.env`, then start the stack.
@@ -35,6 +38,7 @@ Use these database settings during installation:
 - PHP extensions commonly needed by PrestaShop: APCu, BCMath, cURL, GD, Intl, Mbstring, OPCache, PDO MySQL, SOAP, ZIP
 - Caddy rules for PrestaShop-friendly URLs, static cache headers, and blocked sensitive paths
 - PHP settings aligned with PrestaShop 9 requirements, including `memory_limit = 512M`
+- Mailpit for local SMTP capture during shop testing
 - A separate Nginx + PHP-FPM baseline for fair performance comparisons
 
 ## Security Checks
@@ -76,12 +80,15 @@ To install a disposable local shop and get verified URLs:
 ```
 
 The script prints the front-office and back-office URLs after installation.
+Mailpit is available at `http://localhost:8025`; configure PrestaShop SMTP with host `mailpit` and port `1025` for local email capture.
 
 To install the comparable Nginx + PHP-FPM baseline on another port:
 
 ```console
 NGINX_HTTP_PORT=8082 ./scripts/install-nginx-demo.sh
 ```
+
+The Nginx baseline Mailpit UI uses `http://localhost:8026` and SMTP port `1025` inside the Compose network.
 
 ## Performance Comparison
 
