@@ -1,0 +1,27 @@
+name: E2E
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  frankenphp-demo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Install FrankenPHP demo shop
+        run: ./scripts/install-frankenphp-demo.sh
+
+      - name: Verify FrankenPHP demo shop
+        run: ./scripts/verify-local-shop.sh prestashop http://localhost:8080 "FrankenPHP PrestaShop"
+
+      - name: Stop demo stack
+        if: always()
+        run: docker compose -f compose.yaml down -v --remove-orphans

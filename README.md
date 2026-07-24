@@ -87,6 +87,10 @@ NGINX_HTTP_PORT=8082 ./scripts/install-nginx-demo.sh
 
 See [docs/benchmark.md](docs/benchmark.md). The repository includes a Nginx + PHP-FPM baseline, but performance claims should be made only after both stacks run separate PrestaShop installations with the same data and settings.
 
+## Production Notes
+
+See [docs/production.md](docs/production.md) before using this as a production base. The short version: keep PrestaShop writable data persistent, inject secrets through the runtime, configure trusted proxies deliberately, and validate HTTP behavior after each deploy.
+
 ## Why Not Worker Mode Yet?
 
 PrestaShop includes Symfony components, but it is not a pure Symfony application. It still has legacy request state, modules, overrides, sessions, cookies, and filesystem-heavy behavior. This skeleton uses FrankenPHP classic mode first. Worker mode should be treated as a separate compatibility project with cross-request state tests.

@@ -26,6 +26,12 @@ jobs:
       - name: Test benchmark status guard
         run: ./tests/bench-url-status.sh
 
+      - name: Test benchmark summary
+        run: ./tests/bench-url-summary.sh
+
+      - name: Test Nginx PATH_INFO routing
+        run: ./tests/nginx-path-info.sh
+
       - name: Validate Nginx baseline config
         run: docker compose --env-file .env.example -f compose.nginx.yaml config >/dev/null
 
