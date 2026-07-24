@@ -5,11 +5,11 @@ PROJECT_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 readonly PROJECT_ROOT
 readonly ENV_FILE="${PROJECT_ROOT}/.env"
 readonly ENV_EXAMPLE_FILE="${PROJECT_ROOT}/.env.example"
-readonly LOG_FILE="${PROJECT_ROOT}/var/log/full-install-frankenphp.log"
-readonly DEMO_DOMAIN="localhost:8080"
+readonly LOG_FILE="${PROJECT_ROOT}/var/log/full-install-nginx-fpm.log"
+readonly DEMO_DOMAIN="localhost:${NGINX_HTTP_PORT:-8081}"
 readonly ADMIN_EMAIL="admin@example.com"
-readonly ADMIN_PASSWORD="FrankenPHP-Demo-2026!"
-readonly APP_DIR="${PROJECT_ROOT}/prestashop"
+readonly ADMIN_PASSWORD="Nginx-FPM-Demo-2026!"
+readonly APP_DIR="${PROJECT_ROOT}/prestashop-nginx"
 readonly PARAMETERS_FILE="${APP_DIR}/app/config/parameters.php"
 readonly INSTALL_DIR="${APP_DIR}/install"
 
@@ -19,23 +19,23 @@ if [ ! -f "$ENV_FILE" ]; then
 	cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
 fi
 
-"${PROJECT_ROOT}/scripts/install-prestashop.sh"
+PRESTASHOP_APP_DIR="$APP_DIR" "${PROJECT_ROOT}/scripts/install-prestashop.sh"
 
-docker compose -f "${PROJECT_ROOT}/compose.yaml" config >/dev/null
-docker compose -f "${PROJECT_ROOT}/compose.yaml" up -d --build
+docker compose -p frankenphp-prestashop-nginx -f "${PROJECT_ROOT}/compose.nginx.yaml" config >/dev/null
+docker compose -p frankenphp-prestashop-nginx -f "${PROJECT_ROOT}/compose.nginx.yaml" up -d --build
 
 if [ ! -f "$PARAMETERS_FILE" ] || [ -d "$INSTALL_DIR" ]; then
-	docker compose -f "${PROJECT_ROOT}/compose.yaml" exec -T php sh -lc 'rm -rf var/cache/prod var/cache/dev && rm -f app/config/parameters.yml'
+	docker compose -p frankenphp-prestashop-nginx -f "${PROJECT_ROOT}/compose.nginx.yaml" exec -T fpm sh -lc 'rm -rf var/cache/prod var/cache/dev && rm -f app/config/parameters.yml'
 
-	docker compose -f "${PROJECT_ROOT}/compose.yaml" exec -T php \
-		frankenphp php-cli install/index_cli.php \
+	docker compose -p frankenphp-prestashop-nginx -f "${PROJECT_ROOT}/compose.nginx.yaml" exec -T fpm \
+		php install/index_cli.php \
 		--domain="$DEMO_DOMAIN" \
 		--db_server=database \
 		--db_name=prestashop \
 		--db_user=prestashop \
 		--db_password=prestashop \
 		--prefix=ps_ \
-		--name='FrankenPHP PrestaShop' \
+		--name='Nginx FPM PrestaShop' \
 		--email="$ADMIN_EMAIL" \
 		--password="$ADMIN_PASSWORD" \
 		--firstname=Demo \
@@ -48,8 +48,9 @@ if [ ! -f "$PARAMETERS_FILE" ] || [ -d "$INSTALL_DIR" ]; then
 		--fixtures=1 > "$LOG_FILE" 2>&1
 fi
 
-docker compose -f "${PROJECT_ROOT}/compose.yaml" exec -T php sh -lc 'rm -rf install var/cache/prod var/cache/dev'
-docker compose -f "${PROJECT_ROOT}/compose.yaml" exec -T php sh /usr/local/bin/ensure-prestashop-permissions
+docker compose -p frankenphp-prestashop-nginx -f "${PROJECT_ROOT}/compose.nginx.yaml" exec -T fpm sh -lc 'rm -rf install var/cache/prod var/cache/dev'
+docker compose -p frankenphp-prestashop-nginx -f "${PROJECT_ROOT}/compose.nginx.yaml" exec -T fpm \
+	sh /usr/local/bin/ensure-prestashop-permissions
 
 admin_path="$(find "$APP_DIR" -maxdepth 1 -type d -name 'admin*' ! -name 'admin-api' -printf '%f\n' | sort | head -1)"
 printf 'Front office: http://%s/\n' "$DEMO_DOMAIN"

@@ -18,8 +18,10 @@ RUN set -eux; \
 
 COPY --link Caddyfile /etc/caddy/Caddyfile
 COPY --link docker/php/conf/prestashop.ini /usr/local/etc/php/conf.d/prestashop.ini
+COPY --link scripts/ensure-prestashop-permissions.sh /usr/local/bin/ensure-prestashop-permissions
+
+RUN chmod +x /usr/local/bin/ensure-prestashop-permissions
 
 HEALTHCHECK --start-period=60s CMD curl -fsS "http://localhost/healthz" || exit 1
 
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
-

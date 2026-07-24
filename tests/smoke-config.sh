@@ -80,6 +80,8 @@ require_contains "$CADDYFILE_PATH" "respond @blockedFiles 404"
 require_contains "$CADDYFILE_PATH" "respond @blockedDirectories 404"
 require_contains "$CADDYFILE_PATH" "try_files {path} /index.php"
 require_contains "$NGINX_CONFIG_PATH" 'try_files $uri /index.php$is_args$args'
+require_contains "$NGINX_CONFIG_PATH" "fastcgi_split_path_info"
+require_contains "$NGINX_CONFIG_PATH" 'fastcgi_param PATH_INFO $fastcgi_path_info'
 require_contains "$NGINX_CONFIG_PATH" "fastcgi_pass fpm:9000"
 
 require_contains "$PHP_INI_PATH" "expose_php = 0"

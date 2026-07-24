@@ -77,6 +77,12 @@ To install a disposable local shop and get verified URLs:
 
 The script prints the front-office and back-office URLs after installation.
 
+To install the comparable Nginx + PHP-FPM baseline on another port:
+
+```console
+NGINX_HTTP_PORT=8082 ./scripts/install-nginx-demo.sh
+```
+
 ## Performance Comparison
 
 See [docs/benchmark.md](docs/benchmark.md). The repository includes a Nginx + PHP-FPM baseline, but performance claims should be made only after both stacks run separate PrestaShop installations with the same data and settings.

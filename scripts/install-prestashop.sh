@@ -4,7 +4,8 @@ set -eu
 PROJECT_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 readonly PROJECT_ROOT
 readonly ENV_EXAMPLE_FILE="${PROJECT_ROOT}/.env.example"
-readonly APP_DIR="${PROJECT_ROOT}/prestashop"
+readonly DEFAULT_APP_DIR="${PROJECT_ROOT}/prestashop"
+readonly APP_DIR="${PRESTASHOP_APP_DIR:-$DEFAULT_APP_DIR}"
 readonly DOWNLOAD_DIR="${PROJECT_ROOT}/.download"
 readonly PRESTASHOP_CLASSIC_VERSION="9.1.4-5.0"
 readonly PRESTASHOP_ZIP="prestashop_${PRESTASHOP_CLASSIC_VERSION}.zip"

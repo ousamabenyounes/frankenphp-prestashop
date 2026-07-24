@@ -18,4 +18,6 @@ RUN set -eux; \
 		zip
 
 COPY --link docker/php/conf/prestashop.ini /usr/local/etc/php/conf.d/prestashop.ini
+COPY --link scripts/ensure-prestashop-permissions.sh /usr/local/bin/ensure-prestashop-permissions
 
+RUN chmod +x /usr/local/bin/ensure-prestashop-permissions
