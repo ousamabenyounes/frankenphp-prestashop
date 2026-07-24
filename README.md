@@ -1,6 +1,6 @@
 # PrestaShop on FrankenPHP
 
-Run PrestaShop 9.1.4 on top of FrankenPHP using the official FrankenPHP Docker image, Caddy, MariaDB, Redis, OPCache, HTTPS, HTTP/2, and HTTP/3.
+Run PrestaShop 9.1.4 on top of FrankenPHP using the official FrankenPHP Docker image, Caddy, MariaDB, Redis, and OPCache.
 
 This repository is intentionally a skeleton, not a fork of PrestaShop. Put a PrestaShop source tree in `prestashop/`, copy `.env.example` to `.env`, then start the stack.
 
@@ -18,7 +18,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Open `https://localhost:8443` and follow the PrestaShop installer.
+Open `http://localhost:8080` and follow the PrestaShop installer.
 
 Use these database settings during installation:
 
@@ -35,6 +35,7 @@ Use these database settings during installation:
 - PHP extensions commonly needed by PrestaShop: APCu, BCMath, cURL, GD, Intl, Mbstring, OPCache, PDO MySQL, SOAP, ZIP
 - Caddy rules for PrestaShop-friendly URLs, static cache headers, and blocked sensitive paths
 - PHP settings aligned with PrestaShop 9 requirements, including `memory_limit = 512M`
+- A separate Nginx + PHP-FPM baseline for fair performance comparisons
 
 ## Security Checks
 
@@ -65,6 +66,20 @@ The CI runs the same validation plus a real FrankenPHP routing test. That HTTP t
 - static assets return `200` with long-lived immutable cache headers
 - mutable export files use `Cache-Control: no-store`
 - friendly URLs fall back to `index.php`
+
+## Local Demo
+
+To install a disposable local shop and get verified URLs:
+
+```console
+./scripts/install-frankenphp-demo.sh
+```
+
+The script prints the front-office and back-office URLs after installation.
+
+## Performance Comparison
+
+See [docs/benchmark.md](docs/benchmark.md). The repository includes a Nginx + PHP-FPM baseline, but performance claims should be made only after both stacks run separate PrestaShop installations with the same data and settings.
 
 ## Why Not Worker Mode Yet?
 

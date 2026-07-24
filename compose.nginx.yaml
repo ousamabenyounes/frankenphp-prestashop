@@ -1,0 +1,49 @@
+services:
+  nginx:
+    image: nginx:1.27.5-bookworm
+    volumes:
+      - ./prestashop-nginx:/app:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      fpm:
+        condition: service_started
+    ports:
+      - target: 80
+        published: ${NGINX_HTTP_PORT:-8081}
+        protocol: tcp
+
+  fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile.fpm
+    volumes:
+      - ./prestashop-nginx:/app:delegated
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  database:
+    image: mariadb:11.4.7
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-prestashop}
+      MARIADB_USER: ${MARIADB_USER:-prestashop}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-prestashop}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-prestashop-root}
+    volumes:
+      - nginx_database_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  redis:
+    image: redis:7.2.5-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+volumes:
+  nginx_database_data:
+

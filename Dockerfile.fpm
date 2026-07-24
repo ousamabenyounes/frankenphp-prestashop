@@ -1,0 +1,21 @@
+FROM php:8.4-fpm-bookworm
+
+WORKDIR /app
+
+COPY --from=mlocati/php-extension-installer:2.11.12 /usr/bin/install-php-extensions /usr/local/bin/install-php-extensions
+
+RUN set -eux; \
+	install-php-extensions \
+		apcu \
+		bcmath \
+		curl \
+		gd \
+		intl \
+		mbstring \
+		opcache \
+		pdo_mysql \
+		soap \
+		zip
+
+COPY --link docker/php/conf/prestashop.ini /usr/local/etc/php/conf.d/prestashop.ini
+

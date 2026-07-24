@@ -23,5 +23,8 @@ jobs:
       - name: Test Caddy routing
         run: ./tests/caddy-routing.sh
 
+      - name: Validate Nginx baseline config
+        run: docker compose --env-file .env.example -f compose.nginx.yaml config >/dev/null
+
       - name: Verify PrestaShop distribution URL
         run: curl -fLI --retry 3 --retry-delay 2 "https://github.com/PrestaShopCorp/prestashop-classic/releases/download/9.1.4-5.0/prestashop_9.1.4-5.0.zip"

@@ -1,4 +1,5 @@
 .env
 /.download/
 /prestashop/
+/prestashop-nginx/
 /var/log/*.log

@@ -4,6 +4,7 @@ set -eu
 PROJECT_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 readonly PROJECT_ROOT
 readonly COMPOSE_FILE="${PROJECT_ROOT}/compose.yaml"
+readonly NGINX_COMPOSE_FILE="${PROJECT_ROOT}/compose.nginx.yaml"
 readonly CADDYFILE_PATH="${PROJECT_ROOT}/Caddyfile"
 readonly ENV_FILE="${PROJECT_ROOT}/.env"
 readonly ENV_EXAMPLE_FILE="${PROJECT_ROOT}/.env.example"
@@ -27,6 +28,7 @@ if command -v docker >/dev/null 2>&1; then
 
 	if docker compose version >/dev/null 2>&1; then
 		docker compose --env-file "${PROJECT_ROOT}/.env.example" -f "$COMPOSE_FILE" config >/dev/null
+		docker compose --env-file "${PROJECT_ROOT}/.env.example" -f "$NGINX_COMPOSE_FILE" config >/dev/null
 	fi
 
 	docker run --rm \

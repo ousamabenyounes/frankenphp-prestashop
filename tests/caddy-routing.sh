@@ -136,6 +136,8 @@ done
 assert_status "$BASE_URL" "/themes/classic/assets/theme.css" "$EXPECTED_OK"
 assert_header_contains "$BASE_URL" "/themes/classic/assets/theme.css" "$CACHE_HEADER_NAME" "$STATIC_CACHE_VALUE"
 assert_header_contains "$BASE_URL" "/export.csv" "$CACHE_HEADER_NAME" "$MUTABLE_CACHE_VALUE"
+assert_status "$BASE_URL" "/" "$EXPECTED_OK"
+assert_body_contains "$BASE_URL" "/" "fallback:/"
 assert_status "$BASE_URL" "/fr/robes/1-demo-product.html?token=ok" "$EXPECTED_OK"
 assert_body_contains "$BASE_URL" "/fr/robes/1-demo-product.html?token=ok" "fallback:/fr/robes/1-demo-product.html?token=ok"
 
