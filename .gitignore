@@ -1,0 +1,4 @@
+.env
+/.download/
+/prestashop/
+/var/log/*.log

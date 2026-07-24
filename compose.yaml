@@ -1,0 +1,56 @@
+services:
+  php:
+    build:
+      context: .
+      args:
+        FRANKENPHP_IMAGE: ${FRANKENPHP_IMAGE:-dunglas/frankenphp:1.12.5-php8.4-bookworm}
+    env_file:
+      - .env
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+    volumes:
+      - ./prestashop:/app:delegated
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - target: 80
+        published: ${HTTP_PORT:-8080}
+        protocol: tcp
+      - target: 443
+        published: ${HTTPS_PORT:-8443}
+        protocol: tcp
+      - target: 443
+        published: ${HTTP3_PORT:-8443}
+        protocol: udp
+    tty: true
+
+  database:
+    image: mariadb:11.4.7
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-prestashop}
+      MARIADB_USER: ${MARIADB_USER:-prestashop}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-prestashop}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-prestashop-root}
+    volumes:
+      - database_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  redis:
+    image: redis:7.2.5-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+volumes:
+  caddy_data:
+  caddy_config:
+  database_data:
+

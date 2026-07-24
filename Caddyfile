@@ -1,0 +1,41 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$SERVER_NAME:localhost} {
+	root * /app
+	encode zstd br gzip
+
+	@health path /healthz
+	respond @health 204
+
+	@blockedFiles {
+		path /.env /.env.* /composer.* /package*.json /phpunit.xml* /README* /CHANGELOG* /CONTRIBUTING* /LICENSE*
+		path */.git* */.svn* */.hg*
+		path *.sql *.sqlite *.sqlite3 *.log *.md *.dist *.ini *.sh *.yaml *.yml
+	}
+	respond @blockedFiles 404
+
+	@blockedDirectories {
+		path /app/* /bin/* /cache/* /classes/* /config/* /docs/* /download/* /localization/* /override/* /src/* /tests/* /tools/* /translations/* /var/* /vendor/*
+	}
+	respond @blockedDirectories 404
+
+	@staticAssets {
+		path *.avif *.css *.eot *.gif *.ico *.jpeg *.jpg *.js *.json *.map *.otf *.png *.svg *.ttf *.webmanifest *.webp *.woff *.woff2
+	}
+	header @staticAssets Cache-Control "public, max-age=31536000, immutable"
+
+	@mutableAssets {
+		path *.csv *.xml *.zip *.gz
+	}
+	header @mutableAssets Cache-Control "no-store"
+
+	php_server {
+		try_files {path} {path}/ /index.php
+	}
+}
