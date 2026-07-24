@@ -12,6 +12,9 @@ readonly PRESTASHOP_ZIP="prestashop_${PRESTASHOP_CLASSIC_VERSION}.zip"
 readonly PRESTASHOP_INNER_ZIP="prestashop.zip"
 readonly PRESTASHOP_URL="https://github.com/PrestaShopCorp/prestashop-classic/releases/download/${PRESTASHOP_CLASSIC_VERSION}/${PRESTASHOP_ZIP}"
 readonly PRESTASHOP_VERSION_LINE="PRESTASHOP_VERSION=9.1.4"
+readonly DOWNLOAD_RETRIES="8"
+readonly DOWNLOAD_RETRY_DELAY_SECONDS="5"
+readonly DOWNLOAD_CONNECT_TIMEOUT_SECONDS="30"
 
 if ! grep -Fq "$PRESTASHOP_VERSION_LINE" "$ENV_EXAMPLE_FILE"; then
 	printf 'unexpected PrestaShop version in %s; expected %s\n' "$ENV_EXAMPLE_FILE" "$PRESTASHOP_VERSION_LINE" >&2
@@ -26,7 +29,7 @@ fi
 mkdir -p "$APP_DIR" "$DOWNLOAD_DIR"
 
 if [ ! -f "${DOWNLOAD_DIR}/${PRESTASHOP_ZIP}" ]; then
-	curl -fL --retry 3 --retry-delay 2 \
+	curl -fL --retry "$DOWNLOAD_RETRIES" --retry-delay "$DOWNLOAD_RETRY_DELAY_SECONDS" --retry-all-errors --connect-timeout "$DOWNLOAD_CONNECT_TIMEOUT_SECONDS" \
 		-o "${DOWNLOAD_DIR}/${PRESTASHOP_ZIP}" \
 		"$PRESTASHOP_URL"
 fi
