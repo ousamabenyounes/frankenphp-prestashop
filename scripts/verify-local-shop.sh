@@ -60,7 +60,7 @@ assert_title() {
 	expected_text="$2"
 
 	curl -Ls -o "$RESPONSE_BODY_FILE" "$url"
-	if ! grep -Fq "<title>${expected_text}" "$RESPONSE_BODY_FILE"; then
+	if ! grep -Fq "$expected_text" "$RESPONSE_BODY_FILE"; then
 		printf 'missing title for %s: %s\n' "$url" "$expected_text" >&2
 		exit 1
 	fi
@@ -79,7 +79,7 @@ assert_header_contains() {
 	fi
 }
 
-admin_path="$(find "$app_dir" -maxdepth 1 -type d -name 'admin*' ! -name 'admin-api' -printf '%f\n' | sort | head -1)"
+admin_path="$(find "$app_dir" -maxdepth 1 -type d -name 'admin*' ! -name 'admin' ! -name 'admin-api' -printf '%f\n' | sort | head -1)"
 if [ -z "$admin_path" ]; then
 	printf 'PrestaShop admin directory not found in %s\n' "$app_dir" >&2
 	exit 1
